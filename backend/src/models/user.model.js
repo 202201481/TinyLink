@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    index: true, // Index for faster email lookups
   },
   password: {
     type: String,
@@ -21,6 +22,11 @@ const userSchema = new mongoose.Schema({
     required: false,
     default: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp",
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    index: true, // Index for chronological sorting
+  }
 });
 
 userSchema.methods.comparePassword = async function (password) {

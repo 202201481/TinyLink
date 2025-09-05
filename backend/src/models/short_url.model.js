@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const shortUrlSchema = new mongoose.Schema({
-
   full_url: {
     type: String,
     required: true,
@@ -16,10 +15,17 @@ const shortUrlSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0,
+    index: true, // Index for sorting by popularity
   },
   user:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    index: true, // Index for faster user lookups
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    index: true, // Index for chronological sorting
   }
 });
 

@@ -2,6 +2,7 @@ import express from "express";
 import {nanoid} from "nanoid"
 import dotenv from "dotenv"
 import connectDB from "./src/config/monogo.config.js"
+import { initRedis } from "./src/config/redis.config.js"
 import short_url from "./src/routes/short_url.route.js"
 import user_routes from "./src/routes/user.routes.js"
 import auth_routes from "./src/routes/auth.routes.js"
@@ -33,8 +34,9 @@ app.get("/:id",redirectFromShortUrl)
 
 app.use(errorHandler)
 
-app.listen(3000,()=>{
-    connectDB()
+app.listen(3000,async () => {
+    await connectDB();
+    await initRedis();
     console.log("Server is running on http://localhost:3000");
 })
 
