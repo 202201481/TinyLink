@@ -1,18 +1,28 @@
-import { find_url_from_shorturl } from "../dao/short_url.js";
-import { short_url_service } from "../services/short_url.service.js";
-import { generateNanoId } from "../utils/helper.js";
+import { getShortUrl } from "../dao/short_url.js"
+import { createShortUrlWithoutUser, createShortUrlWithUser } from "../services/short_url.service.js"
+import wrapAsync from "../utils/tryCatchWrapper.js"
 
-export const create_short_url =  async (req, res) => {
-  const {url} = req.body 
-  console.log(url);
+export const createShortUrl = wrapAsync(async (req,res)=>{
+    const data = req.body
+    let shortUrl
+    if(req.user){
+        shortUrl = await createShortUrlWithUser(data.url,req.user._id,data.slug)
+    }else{  
+        shortUrl = await createShortUrlWithoutUser(data.url)
+    }
+    res.status(200).json({shortUrl : process.env.APP_URL + shortUrl})
+})
 
-  const shorturl = await short_url_service(url);
-    res.send(process.env.APP_URL+ shorturl);
 
-}
+export const redirectFromShortUrl = wrapAsync(async (req,res)=>{
+    const {id} = req.params
+    const url = await getShortUrl(id)
+    if(!url) throw new Error("Short URL not found")
+    res.redirect(url.full_url)
+})
 
-export const redirect_short_url = async (req, res) => {
-  const {id} = req.params;
-  const url = await find_url_from_shorturl(id);
-  res.redirect(url.full_url);
-}
+export const createCustomShortUrl = wrapAsync(async (req,res)=>{
+    const {url,slug} = req.body
+    const shortUrl = await createShortUrlWithoutUser(url,customUrl)
+    res.status(200).json({shortUrl : process.env.APP_URL + shortUrl})
+})
